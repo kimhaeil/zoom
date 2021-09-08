@@ -1,6 +1,7 @@
 import http from "http"
 import WebSocket from 'ws';
 import express from "express"
+import { Console } from 'console';
 
 const app = express();
 
@@ -17,14 +18,15 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({server});
 
 
-wss.on("connection", (socket) => {
-    
-    socket.on("close", () =>{
-        console.log("Disconnect with client");
-    });
+const sockets = [];
 
+wss.on("connection", (socket) => {
+    sockets.push(socket);
+    socket.on("close", ()=>{
+        console.log("Socket Closed");
+    })
     socket.on("message", (message) =>{
-        console.log(message);
+        sockets.forEach(aSocket => aSocket.send(message));   
     });
 
     socket.send("hello!!");

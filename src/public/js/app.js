@@ -1,4 +1,8 @@
+const messageList = document.querySelector("ul");
+const messageForm = document.querySelector("form"); 
+
 const host = window.location.host;
+
 
 
 const socket = new WebSocket(`ws://${host}`);
@@ -9,13 +13,26 @@ socket.addEventListener("open", () =>{
 });
 
 socket.addEventListener("message", (message) =>{
-    console.log("Just got this:", message.data, "from server");
+   const li = document.createElement("li");
+   
+   const reaeder = new FileReader();
+   const msg ;
+   reaeder.addEventListener('loadend', ()=>{
+    msg = reader.result;
+   });
+   reaeder.readAsArrayBuffer(message.data);
+   li.innerText = text;
+   messageList.append(li);
 });
 
 socket.addEventListener("close", () =>{
     console.log("Disconnected server");
 });
 
-setTimeout(() => {
-    socket.send("hello from browser");
-}, 10000);
+function handleSubmit(event) {
+    event.preventDefault();
+    const input = messageForm.querySelector("input");
+    socket.send(input.value);
+}
+
+messageForm.addEventListener("submit", handleSubmit);
